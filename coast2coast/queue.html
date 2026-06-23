@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coast2Coast – Band Queue</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="password-overlay" class="overlay">
+    <div class="overlay-card">
+      <h2>Coast2Coast</h2>
+      <p>Band access — enter queue password</p>
+      <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+      <button class="btn btn-primary" style="width:100%" id="pw-btn">Enter</button>
+      <div id="pw-error"></div>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <header>
+      <h1>Coast2Coast</h1>
+      <p>Song Request Queue</p>
+    </header>
+    <main>
+      <div class="card">
+        <div class="queue-header">
+          <h2>Requests</h2>
+          <span id="last-updated"></span>
+        </div>
+        <div id="queue-list"><p class="muted">Loading...</p></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let queuePassword = 'stella';
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('pw-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') attemptLogin();
+    });
+    document.getElementById('pw-btn').addEventListener('click', attemptLogin);
+
+    async function attemptLogin() {
+      const val = document.getElementById('pw-input').value;
+      if (!val) return;
+
+      const btn = document.getElementById('pw-btn');
+      const errEl = document.getElementById('pw-error');
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+      errEl.textContent = '';
+
+      try {
+        const res = await fetch('/api/checkAuth', {
+          headers: { 'X-Queue-Password': val }
+        });
+        if (res.ok) {
+          queuePassword = val;
+          document.getElementById('password-overlay').classList.add('hidden');
+          document.getElementById('app').classList.remove('hidden');
+          refreshQueue();
+        } else {
+          errEl.textContent = 'Incorrect password.';
+          document.getElementById('pw-input').value = '';
+          document.getElementById('pw-input').focus();
+          btn.disabled = false;
+          btn.textContent = 'Enter';
+        }
+      } catch {
+        errEl.textContent = 'Could not connect. Try again.';
+        btn.disabled = false;
+        btn.textContent = 'Enter';
+      }
+    }
+
+    async function refreshQueue() {
+      try {
+        const res = await fetch('/api/getRequests');
+        if (!res.ok) return;
+        const requests = await res.json();
+        renderQueue(requests);
+        document.getElementById('last-updated').textContent =
+          'Updated ' + new Date().toLocaleTimeString();
+      } catch {
+        document.getElementById('queue-list').innerHTML =
+          '<p class="muted">Error loading requests.</p>';
+      }
+    }
+
+    function renderQueue(requests) {
+      const el = document.getElementById('queue-list');
+      if (!requests.length) {
+        el.innerHTML = '<p class="muted">No requests yet.</p>';
+        return;
+      }
+
+      const pending  = requests.filter(r => r.status === 'pending');
+      const played   = requests.filter(r => r.status === 'played');
+      const sections = [];
+
+      if (pending.length) {
+        sections.push(`<div class="section-label">Pending (${pending.length})</div>`);
+        sections.push(pending.map(r => requestRow(r, false)).join(''));
+      }
+
+      if (played.length) {
+        sections.push(`<div class="section-label" style="margin-top:1rem">Played (${played.length})</div>`);
+        sections.push(played.map(r => requestRow(r, true)).join(''));
+      }
+
+      el.innerHTML = sections.join('');
+
+      el.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', () =>
+          updateRequest(btn.dataset.rowKey, btn.dataset.partitionKey, btn.dataset.action, btn)
+        );
+      });
+    }
+
+    function requestRow(r, isPlayed) {
+      const actions = isPlayed
+        ? `<span class="status-badge status-played">played</span>`
+        : `<div class="queue-actions">
+             <button class="btn btn-sm btn-success"
+               data-action="played"
+               data-row-key="${esc(r.rowKey)}"
+               data-partition-key="${esc(r.partitionKey)}">Played</button>
+             <button class="btn btn-sm btn-ghost"
+               data-action="dismissed"
+               data-row-key="${esc(r.rowKey)}"
+               data-partition-key="${esc(r.partitionKey)}">Dismiss</button>
+           </div>`;
+
+      return `
+        <div class="queue-item">
+          <div class="queue-item-info">
+            <div class="queue-item-song">${esc(r.songName)}</div>
+            <div class="queue-item-meta">from ${esc(r.requesterName)} &middot; ${timeAgo(r.requestedAt)}</div>
+          </div>
+          ${actions}
+        </div>`;
+    }
+
+    async function updateRequest(rowKey, partitionKey, status, btn) {
+      const origText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch('/api/updateRequest', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Queue-Password': queuePassword
+          },
+          body: JSON.stringify({ rowKey, partitionKey, status })
+        });
+        if (res.ok) {
+          await refreshQueue();
+        } else if (res.status === 401) {
+          document.getElementById('password-overlay').classList.remove('hidden');
+          document.getElementById('app').classList.add('hidden');
+        } else {
+          btn.disabled = false;
+          btn.textContent = origText;
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
+    }
+
+    function timeAgo(iso) {
+      const diff = Math.floor((Date.now() - new Date(iso)) / 60000);
+      if (diff < 1)  return 'just now';
+      if (diff < 60) return `${diff}m ago`;
+      return `${Math.floor(diff / 60)}h ago`;
+    }
+
+    setInterval(() => { if (queuePassword) refreshQueue(); }, 10000);
+  </script>
+</body>
+</html>

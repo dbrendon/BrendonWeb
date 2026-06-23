@@ -1,0 +1,10 @@
+{
+  "name": "coast2coast-api",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.2.0"
+  }
+}

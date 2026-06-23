@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coast2Coast – Song Requests</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Coast2Coast</h1>
+    <p>Request a song for the band</p>
+  </header>
+
+  <main>
+    <div id="request-panel" class="card hidden">
+      <div id="selected-song-display" class="selected-song"></div>
+      <label for="requester-name">Your name <span class="optional">(optional)</span></label>
+      <input type="text" id="requester-name" placeholder="e.g. Table 7 or your name" maxlength="50" autocomplete="off">
+      <div class="button-row">
+        <button id="submit-btn" class="btn btn-primary">Send Request</button>
+        <button id="cancel-btn" class="btn btn-ghost">Cancel</button>
+      </div>
+      <div id="submit-status" class="status-msg"></div>
+    </div>
+
+    <section class="card">
+      <div id="search-wrapper">
+        <input type="search" id="song-search" placeholder="Search songs..." autocomplete="off" aria-label="Search songs">
+      </div>
+      <div id="song-list"><p class="muted">Loading songs...</p></div>
+    </section>
+
+    <section class="card">
+      <h2>Request Queue</h2>
+      <div id="queue-list"><p class="muted">Loading...</p></div>
+    </section>
+  </main>
+
+  <script>
+    let allSongs = [];
+    let selectedSong = null;
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Load song list
+    fetch('songs.json')
+      .then(r => r.json())
+      .then(songs => {
+        allSongs = songs.slice().sort((a, b) => a.title.localeCompare(b.title));
+        renderSongs(allSongs);
+      })
+      .catch(() => {
+        document.getElementById('song-list').innerHTML = '<p class="muted">Could not load song list.</p>';
+      });
+
+    function renderSongs(songs) {
+      const el = document.getElementById('song-list');
+      if (!songs.length) {
+        el.innerHTML = '<p class="muted">No songs found.</p>';
+        return;
+      }
+      el.innerHTML = songs.map(s =>
+        `<div class="song-item" data-title="${esc(s.title)}" data-artist="${esc(s.artist)}" tabindex="0" role="button" aria-label="${esc(s.title)} by ${esc(s.artist)}">
+          <div class="song-title">${esc(s.title)}</div>
+          <div class="song-artist">${esc(s.artist)}</div>
+        </div>`
+      ).join('');
+
+      el.querySelectorAll('.song-item').forEach(item => {
+        const handler = () => selectSong(item.dataset.title, item.dataset.artist);
+        item.addEventListener('click', handler);
+        item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
+      });
+    }
+
+    document.getElementById('song-search').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      if (!q) { renderSongs(allSongs); return; }
+      renderSongs(allSongs.filter(s =>
+        s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)
+      ));
+    });
+
+    function selectSong(title, artist) {
+      selectedSong = { title, artist };
+      document.getElementById('selected-song-display').innerHTML =
+        `"${esc(title)}" <span class="by">by ${esc(artist)}</span>`;
+      const panel = document.getElementById('request-panel');
+      panel.classList.remove('hidden');
+      document.getElementById('requester-name').value = '';
+      document.getElementById('submit-status').textContent = '';
+      document.getElementById('submit-status').className = 'status-msg';
+      document.getElementById('submit-btn').disabled = false;
+      document.getElementById('submit-btn').textContent = 'Send Request';
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => document.getElementById('requester-name').focus(), 300);
+    }
+
+    document.getElementById('cancel-btn').addEventListener('click', () => {
+      document.getElementById('request-panel').classList.add('hidden');
+      selectedSong = null;
+    });
+
+    document.getElementById('requester-name').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('submit-btn').click();
+    });
+
+    document.getElementById('submit-btn').addEventListener('click', async () => {
+      if (!selectedSong) return;
+      const nameInput = document.getElementById('requester-name');
+      const btn = document.getElementById('submit-btn');
+      const statusEl = document.getElementById('submit-status');
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      statusEl.textContent = '';
+      statusEl.className = 'status-msg';
+
+      try {
+        const res = await fetch('/api/submitRequest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            songName: selectedSong.title,
+            requesterName: nameInput.value.trim() || 'Anonymous'
+          })
+        });
+        if (res.ok) {
+          statusEl.textContent = 'Request sent! The band will see it shortly.';
+          statusEl.className = 'status-msg success';
+          btn.textContent = 'Sent!';
+          refreshQueue();
+          setTimeout(() => {
+            document.getElementById('request-panel').classList.add('hidden');
+            selectedSong = null;
+            btn.disabled = false;
+            btn.textContent = 'Send Request';
+          }, 2500);
+        } else {
+          throw new Error('Server error');
+        }
+      } catch {
+        statusEl.textContent = 'Something went wrong. Please try again.';
+        statusEl.className = 'status-msg error';
+        btn.disabled = false;
+        btn.textContent = 'Send Request';
+      }
+    });
+
+    // Queue polling
+    async function refreshQueue() {
+      try {
+        const res = await fetch('/api/getRequests');
+        if (!res.ok) return;
+        const requests = await res.json();
+        renderQueue(requests);
+      } catch {}
+    }
+
+    function renderQueue(requests) {
+      const el = document.getElementById('queue-list');
+      if (!requests.length) {
+        el.innerHTML = '<p class="muted">No requests yet — be the first!</p>';
+        return;
+      }
+      el.innerHTML = requests.map(r => `
+        <div class="queue-item">
+          <div class="queue-item-info">
+            <div class="queue-item-song">${esc(r.songName)}</div>
+            <div class="queue-item-meta">from ${esc(r.requesterName)}</div>
+          </div>
+          <span class="status-badge status-${esc(r.status)}">${esc(r.status)}</span>
+        </div>
+      `).join('');
+    }
+
+    refreshQueue();
+    setInterval(refreshQueue, 10000);
+  </script>
+</body>
+</html>
