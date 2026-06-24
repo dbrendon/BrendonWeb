@@ -68,14 +68,9 @@ header p {
 
 .site-link {
   display: inline-block;
-  margin-top: 0.4rem;
-  font-size: 0.78rem;
-  color: var(--accent);
+  margin-top: 0.5rem;
   text-decoration: none;
-  opacity: 0.75;
 }
-
-.site-link:hover { opacity: 1; text-decoration: underline; }
 
 .logo { cursor: pointer; }
 
