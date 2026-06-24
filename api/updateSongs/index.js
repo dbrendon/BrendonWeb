@@ -3,7 +3,7 @@ const { TableClient } = require('@azure/data-tables');
 const TABLE_NAME = 'C2CSongs';
 
 module.exports = async function (context, req) {
-    const password = req.headers['x-queue-password'];
+    const password = req.headers['x-api-password'];
     const expectedPassword = process.env.API_PASSWORD;
 
     if (!expectedPassword || password !== expectedPassword) {
