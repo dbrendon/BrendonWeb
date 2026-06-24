@@ -4,8 +4,9 @@
   --bg: #000;
   --surface: #1a1a2e;
   --surface2: #2a2a48;
-  --accent: #0c6385;
+  --accent: #aed4e3;
   --text: #f0eff0;
+  --text2: #7dd7f0;
   --muted: #8888a8;
   --pending: #4a9eff;
   --played: #4caf50;
@@ -49,7 +50,7 @@ header h1 {
 }
 
 header h2 {
-  color: var(--muted);
+  color: var(--text2);
   font-size: 0.82rem;
   font-weight: 600;
   text-transform: none;
@@ -174,7 +175,7 @@ label .optional { font-style: italic; }
 
 .song-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.05rem; }
 
-.song-artist { font-family: 'Playfair Display', serif; font-size: 0.97rem; color: var(--muted); margin-top: 0.1rem; }
+.song-artist { font-family: 'Playfair Display', serif; font-size: 0.97rem; color: var(--text2); margin-top: 0.1rem; }
 
 /* Request panel */
 .selected-song {
