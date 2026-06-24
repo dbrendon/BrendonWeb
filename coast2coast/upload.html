@@ -67,7 +67,7 @@
 
       try {
         const res = await fetch('/api/checkAuth', {
-          headers: { 'X-Queue-Password': val }
+          headers: { 'X-Api-Password': val }
         });
         if (res.ok) {
           queuePassword = val;
@@ -136,7 +136,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Queue-Password': queuePassword
+            'X-Api-Password': queuePassword
           },
           body: JSON.stringify(parsedSongs)
         });
