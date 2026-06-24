@@ -157,8 +157,9 @@ label .optional { font-style: italic; }
 #search-wrapper { margin-bottom: 0.75rem; }
 
 #song-list {
-  max-height: 55vh;
+  max-height: 38vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .song-item {
