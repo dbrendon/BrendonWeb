@@ -5,7 +5,7 @@ const ALLOWED_STATUSES = ['played', 'dismissed'];
 
 module.exports = async function (context, req) {
     const password = req.headers['x-queue-password'];
-    const expectedPassword = process.env.QUEUE_PASSWORD;
+    const expectedPassword = process.env.API_PASSWORD;
 
     if (!expectedPassword || password !== expectedPassword) {
         context.res = { status: 401, body: 'Unauthorized' };
