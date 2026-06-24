@@ -83,12 +83,14 @@ main {
 }
 
 h2 {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.75rem;
+  font-family: 'Playfair Display', serif;
+  color: var(--text2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 0.2rem;
+  margin-bottom: 0;
 }
 
 /* Currency input */
