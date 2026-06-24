@@ -127,7 +127,13 @@
 
     function requestRow(r, isPlayed) {
       const actions = isPlayed
-        ? `<span class="status-badge status-played">played</span>`
+        ? `<div class="queue-actions">
+             <span class="status-badge status-played">played</span>
+             <button class="btn btn-sm btn-ghost"
+               data-action="dismissed"
+               data-row-key="${esc(r.rowKey)}"
+               data-partition-key="${esc(r.partitionKey)}">Dismiss</button>
+           </div>`
         : `<div class="queue-actions">
              <button class="btn btn-sm btn-success"
                data-action="played"
