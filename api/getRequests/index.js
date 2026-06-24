@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
     const client = TableClient.fromConnectionString(connectionString, TABLE_NAME);
     try { await client.createTable(); } catch {}
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' });
     const requests = [];
 
     const iter = client.listEntities({

@@ -30,7 +30,7 @@ module.exports = async function (context, req) {
     const client = TableClient.fromConnectionString(connectionString, TABLE_NAME);
     try { await client.createTable(); } catch {}
 
-    const date = new Date().toISOString().slice(0, 10);
+    const date = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Toronto' });
     const rowKey = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
     await client.createEntity({
