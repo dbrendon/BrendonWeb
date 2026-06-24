@@ -40,6 +40,7 @@ header {
 }
 
 header h1 {
+  font-family: 'Playfair Display', serif;
   font-size: 1.4rem;
   color: var(--accent);
   font-weight: 700;
@@ -171,12 +172,13 @@ label .optional { font-style: italic; }
 
 .song-item:hover, .song-item:active { background: var(--surface2); }
 
-.song-title { font-weight: 600; font-size: 0.97rem; }
+.song-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.05rem; }
 
-.song-artist { font-size: 0.82rem; color: var(--muted); margin-top: 0.1rem; }
+.song-artist { font-family: 'Playfair Display', serif; font-size: 0.97rem; color: var(--muted); margin-top: 0.1rem; }
 
 /* Request panel */
 .selected-song {
+  font-family: 'Playfair Display', serif;
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--accent);
