@@ -161,21 +161,45 @@ label .optional { font-style: italic; }
 }
 
 .song-item {
-  padding: 0.7rem 0.5rem;
+  padding: 0.5rem 0.5rem;
   border-bottom: 1px solid var(--surface2);
   cursor: pointer;
   border-radius: 6px;
   transition: background 0.12s;
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  min-width: 0;
 }
 
 .song-item:last-child { border-bottom: none; }
 
 .song-item:hover, .song-item:active { background: var(--surface2); }
 
-.song-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.05rem; }
+.song-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
 
-.song-artist { font-family: 'Playfair Display', serif; font-size: 0.97rem; color: var(--text2); margin-top: 0.1rem; }
+.song-artist {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  color: var(--text2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.song-artist::before {
+  content: ' · ';
+  color: var(--muted);
+}
 
 /* Request panel */
 .selected-song {
