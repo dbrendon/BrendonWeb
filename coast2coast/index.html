@@ -26,12 +26,14 @@
   <main>
     <div id="request-panel" class="card hidden">
       <div id="selected-song-display" class="selected-song"></div>
-      <label for="requester-name">Your name</label>
+      <label for="requester-name">Your name *</label>
       <input type="text" id="requester-name" placeholder="Your name" maxlength="50" autocomplete="off" required>
-      <label for="tip-amount">Tip Amount (use the tip jar - or eTransfer to david@brendon.ca)</label>
+      <label for="tip-amount">Tip Amount *</label>
+      
       <div class="input-currency">
         <span>$</span>
-        <input type="number" id="tip-amount" min="1" step="1" placeholder="suggested: $5" required>
+        <input type="number" id="tip-amount" min="1" step="1" placeholder="- suggested amount 5" required>
+        <label for="tip-amount">(use the tip jar - or eTransfer to david@brendon.ca)</label>
       </div>
       <div class="button-row">
         <button id="submit-btn" class="btn btn-primary">Send Request</button>
