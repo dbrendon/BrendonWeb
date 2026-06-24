@@ -43,7 +43,7 @@ header {
 header h1 {
   font-family: 'Playfair Display', serif;
   font-size: 1.8rem;
-  color: var(--accent);
+  color: var(--text);
   font-weight: 700;
   letter-spacing: 0.04em;
   margin-top: 0.4rem;
