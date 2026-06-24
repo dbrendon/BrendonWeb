@@ -5,10 +5,15 @@ const TABLE_NAME = 'SongRequests';
 module.exports = async function (context, req) {
     const body = req.body || {};
     const songName = String(body.songName || '').trim();
-    const requesterName = String(body.requesterName || '').trim() || 'Anonymous';
+    const requesterName = String(body.requesterName || '').trim();
+    const tipAmount = parseInt(body.tipAmount, 10);
 
-    if (!songName) {
-        context.res = { status: 400, body: 'songName is required' };
+    if (!songName || !requesterName) {
+        context.res = { status: 400, body: 'songName and requesterName are required' };
+        return;
+    }
+    if (isNaN(tipAmount) || tipAmount < 1) {
+        context.res = { status: 400, body: 'tipAmount must be at least 1' };
         return;
     }
     if (songName.length > 200 || requesterName.length > 100) {
@@ -33,6 +38,7 @@ module.exports = async function (context, req) {
         rowKey,
         songName,
         requesterName,
+        tipAmount,
         status: 'pending',
         requestedAt: new Date().toISOString()
     });

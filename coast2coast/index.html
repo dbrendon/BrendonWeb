@@ -8,15 +8,20 @@
 </head>
 <body>
   <header>
-    <h1>Request a Song</h1>
+    <img src="logo.png" alt="Coast 2 Coast" class="logo">
     <p>We'll try our best to play your song if it fits the vibe</p>
   </header>
 
   <main>
     <div id="request-panel" class="card hidden">
       <div id="selected-song-display" class="selected-song"></div>
-      <label for="requester-name">Your name <span class="optional">(optional)</span></label>
-      <input type="text" id="requester-name" placeholder="e.g. Table 7 or your name" maxlength="50" autocomplete="off">
+      <label for="requester-name">Your name</label>
+      <input type="text" id="requester-name" placeholder="Your name" maxlength="50" autocomplete="off" required>
+      <label for="tip-amount">Tip Amount</label>
+      <div class="input-currency">
+        <span>$</span>
+        <input type="number" id="tip-amount" min="1" step="1" placeholder="5" required>
+      </div>
       <div class="button-row">
         <button id="submit-btn" class="btn btn-primary">Send Request</button>
         <button id="cancel-btn" class="btn btn-ghost">Cancel</button>
@@ -47,7 +52,6 @@
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Load song list
     fetch('songs.json')
       .then(r => r.json())
       .then(songs => {
@@ -93,6 +97,7 @@
       const panel = document.getElementById('request-panel');
       panel.classList.remove('hidden');
       document.getElementById('requester-name').value = '';
+      document.getElementById('tip-amount').value = '';
       document.getElementById('submit-status').textContent = '';
       document.getElementById('submit-status').className = 'status-msg';
       document.getElementById('submit-btn').disabled = false;
@@ -107,14 +112,35 @@
     });
 
     document.getElementById('requester-name').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('tip-amount').focus();
+    });
+
+    document.getElementById('tip-amount').addEventListener('keydown', e => {
       if (e.key === 'Enter') document.getElementById('submit-btn').click();
     });
 
     document.getElementById('submit-btn').addEventListener('click', async () => {
       if (!selectedSong) return;
       const nameInput = document.getElementById('requester-name');
-      const btn = document.getElementById('submit-btn');
-      const statusEl = document.getElementById('submit-status');
+      const tipInput  = document.getElementById('tip-amount');
+      const btn       = document.getElementById('submit-btn');
+      const statusEl  = document.getElementById('submit-status');
+
+      const name = nameInput.value.trim();
+      const tip  = parseInt(tipInput.value, 10);
+
+      if (!name) {
+        statusEl.textContent = 'Please enter your name.';
+        statusEl.className = 'status-msg error';
+        nameInput.focus();
+        return;
+      }
+      if (!tipInput.value || isNaN(tip) || tip < 1) {
+        statusEl.textContent = 'Please enter a tip amount (minimum $1).';
+        statusEl.className = 'status-msg error';
+        tipInput.focus();
+        return;
+      }
 
       btn.disabled = true;
       btn.textContent = 'Sending...';
@@ -125,10 +151,7 @@
         const res = await fetch('/api/submitRequest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            songName: selectedSong.title,
-            requesterName: nameInput.value.trim() || 'Anonymous'
-          })
+          body: JSON.stringify({ songName: selectedSong.title, requesterName: name, tipAmount: tip })
         });
         if (res.ok) {
           statusEl.textContent = 'Request sent! The band will see it shortly.';
@@ -152,7 +175,6 @@
       }
     });
 
-    // Queue polling
     async function refreshQueue() {
       try {
         const res = await fetch('/api/getRequests');

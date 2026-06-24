@@ -27,6 +27,7 @@ module.exports = async function (context, req) {
             partitionKey: entity.partitionKey,
             songName: entity.songName,
             requesterName: entity.requesterName,
+            tipAmount: entity.tipAmount || 0,
             status: entity.status,
             requestedAt: entity.requestedAt
         });

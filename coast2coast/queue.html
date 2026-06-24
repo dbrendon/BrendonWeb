@@ -143,7 +143,7 @@
         <div class="queue-item">
           <div class="queue-item-info">
             <div class="queue-item-song">${esc(r.songName)}</div>
-            <div class="queue-item-meta">from ${esc(r.requesterName)} &middot; ${timeAgo(r.requestedAt)}</div>
+            <div class="queue-item-meta">from ${esc(r.requesterName)} &middot; $${r.tipAmount} tip &middot; ${timeAgo(r.requestedAt)}</div>
           </div>
           ${actions}
         </div>`;

@@ -1,7 +1,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0d0d1a;
+  --bg: #000;
   --surface: #1a1a2e;
   --surface2: #2a2a48;
   --accent: #d4a929;
@@ -32,11 +32,11 @@ header {
   z-index: 10;
 }
 
-header h1 {
-  font-size: 1.75rem;
-  color: var(--accent);
-  letter-spacing: 0.06em;
-  font-weight: 700;
+.logo {
+  max-width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5rem;
 }
 
 header p {
@@ -69,6 +69,39 @@ h2 {
   letter-spacing: 0.1em;
   margin-bottom: 0.75rem;
 }
+
+/* Currency input */
+.input-currency {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--surface2);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.input-currency:focus-within { border-color: var(--accent); }
+.input-currency > span {
+  padding: 0.75rem 0.25rem 0.75rem 1rem;
+  color: var(--muted);
+  font-size: 1rem;
+  user-select: none;
+}
+.input-currency input[type="number"] {
+  flex: 1;
+  padding: 0.75rem 1rem 0.75rem 0.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.input-currency input[type="number"]::-webkit-inner-spin-button,
+.input-currency input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
 input[type="search"],
 input[type="text"],
