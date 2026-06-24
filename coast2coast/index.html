@@ -11,9 +11,15 @@
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="Coast 2 Coast" class="logo" size="small">
-    <h1>Request a Song</h1>
-    <h2>We'll try our best to play your song if it fits the vibe</h2>
+    <table>
+      <tr>
+        <td><img src="logo.png" alt="Coast 2 Coast" class="logo" size="small"></td>
+        <td>
+          <h1>Request a Song</h1>
+          <h2>We'll try our best to play your song if it fits the vibe</h2>
+        </td>
+      </tr>
+    </table>
   </header>
 
   <main>
@@ -21,7 +27,7 @@
       <div id="selected-song-display" class="selected-song"></div>
       <label for="requester-name">Your name</label>
       <input type="text" id="requester-name" placeholder="Your name" maxlength="50" autocomplete="off" required>
-      <label for="tip-amount">Tip Amount</label>
+      <label for="tip-amount">Tip Amount (use the tip charge or eTranser to david@brendon.ca)</label>
       <div class="input-currency">
         <span>$</span>
         <input type="number" id="tip-amount" min="1" step="1" placeholder="5" required>

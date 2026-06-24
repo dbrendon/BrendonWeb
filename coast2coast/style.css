@@ -4,7 +4,7 @@
   --bg: #000;
   --surface: #1a1a2e;
   --surface2: #2a2a48;
-  --accent: #d4a929;
+  --accent: #0c6385;
   --text: #f0eff0;
   --muted: #8888a8;
   --pending: #4a9eff;
@@ -51,7 +51,7 @@ header h1 {
 header h2 {
   color: var(--muted);
   font-size: 0.82rem;
-  font-weight: 400;
+  font-weight: 600;
   text-transform: none;
   letter-spacing: 0;
   margin-top: 0.2rem;
