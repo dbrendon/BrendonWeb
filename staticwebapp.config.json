@@ -1,4 +1,11 @@
 {
+  "routes": [
+    {
+      "route": "/coast2coast",
+      "redirect": "/coast2coast/",
+      "statusCode": 301
+    }
+  ],
   "globalHeaders": {
     "X-Frame-Options": "",
     "Content-Security-Policy": "frame-ancestors *"
