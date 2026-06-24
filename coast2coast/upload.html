@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coast2Coast – Upload Songs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="password-overlay" class="overlay">
+    <div class="overlay-card">
+      <h2>Coast2Coast</h2>
+      <p>Band access — enter password</p>
+      <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+      <button class="btn btn-primary" style="width:100%" id="pw-btn">Enter</button>
+      <div id="pw-error"></div>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
+    <header>
+      <h1>Coast2Coast</h1>
+      <p>Upload Song List</p>
+    </header>
+    <main>
+      <div class="card">
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:1rem">
+          Select a <code>songs.json</code> file — an array of <code>{"{"}"title","artist"{"}"}</code> objects.
+          This replaces the current song list on the site.
+        </p>
+        <label for="file-input">Songs JSON file</label>
+        <input type="file" id="file-input" accept=".json,application/json" style="margin-bottom:1rem">
+        <div id="preview" style="display:none">
+          <div id="preview-label" style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem"></div>
+        </div>
+        <button id="upload-btn" class="btn btn-primary" style="width:100%" disabled>Upload</button>
+        <div id="upload-status" class="status-msg"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let queuePassword = '';
+    let parsedSongs = null;
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('pw-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') attemptLogin();
+    });
+    document.getElementById('pw-btn').addEventListener('click', attemptLogin);
+
+    async function attemptLogin() {
+      const val = document.getElementById('pw-input').value;
+      if (!val) return;
+
+      const btn = document.getElementById('pw-btn');
+      const errEl = document.getElementById('pw-error');
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+      errEl.textContent = '';
+
+      try {
+        const res = await fetch('/api/checkAuth', {
+          headers: { 'X-Queue-Password': val }
+        });
+        if (res.ok) {
+          queuePassword = val;
+          document.getElementById('password-overlay').classList.add('hidden');
+          document.getElementById('app').classList.remove('hidden');
+        } else {
+          errEl.textContent = 'Incorrect password.';
+          document.getElementById('pw-input').value = '';
+          document.getElementById('pw-input').focus();
+          btn.disabled = false;
+          btn.textContent = 'Enter';
+        }
+      } catch {
+        errEl.textContent = 'Could not connect. Try again.';
+        btn.disabled = false;
+        btn.textContent = 'Enter';
+      }
+    }
+
+    document.getElementById('file-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      const preview = document.getElementById('preview');
+      const previewLabel = document.getElementById('preview-label');
+      const uploadBtn = document.getElementById('upload-btn');
+      const statusEl = document.getElementById('upload-status');
+
+      parsedSongs = null;
+      uploadBtn.disabled = true;
+      statusEl.textContent = '';
+      statusEl.className = 'status-msg';
+      preview.style.display = 'none';
+
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!Array.isArray(data)) throw new Error('Not an array');
+          const valid = data.filter(s => s && typeof s.title === 'string' && s.title.trim());
+          if (!valid.length) throw new Error('No valid songs found');
+          parsedSongs = valid;
+          previewLabel.textContent = `${valid.length} song${valid.length !== 1 ? 's' : ''} ready to upload`;
+          preview.style.display = 'block';
+          uploadBtn.disabled = false;
+        } catch {
+          statusEl.textContent = 'Invalid file — must be a JSON array of {"title","artist"} objects.';
+          statusEl.className = 'status-msg error';
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('upload-btn').addEventListener('click', async () => {
+      if (!parsedSongs) return;
+
+      const btn = document.getElementById('upload-btn');
+      const statusEl = document.getElementById('upload-status');
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+      statusEl.textContent = '';
+      statusEl.className = 'status-msg';
+
+      try {
+        const res = await fetch('/api/updateSongs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Queue-Password': queuePassword
+          },
+          body: JSON.stringify(parsedSongs)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          statusEl.textContent = `Done — ${data.count} songs uploaded.`;
+          statusEl.className = 'status-msg success';
+          btn.textContent = 'Upload';
+          document.getElementById('file-input').value = '';
+          document.getElementById('preview').style.display = 'none';
+          parsedSongs = null;
+        } else if (res.status === 401) {
+          document.getElementById('password-overlay').classList.remove('hidden');
+          document.getElementById('app').classList.add('hidden');
+          btn.textContent = 'Upload';
+        } else {
+          throw new Error('Server error');
+        }
+      } catch {
+        statusEl.textContent = 'Upload failed. Please try again.';
+        statusEl.className = 'status-msg error';
+        btn.disabled = false;
+        btn.textContent = 'Upload';
+      }
+    });
+  </script>
+</body>
+</html>

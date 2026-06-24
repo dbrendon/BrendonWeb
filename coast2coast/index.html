@@ -67,7 +67,7 @@
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    fetch('songs.json')
+    fetch('/api/getSongs')
       .then(r => r.json())
       .then(songs => {
         allSongs = songs.slice().sort((a, b) => a.title.localeCompare(b.title));
