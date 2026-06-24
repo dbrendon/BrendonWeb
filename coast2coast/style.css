@@ -66,6 +66,19 @@ header p {
   margin-top: 0.2rem;
 }
 
+.site-link {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--accent);
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+.site-link:hover { opacity: 1; text-decoration: underline; }
+
+.logo { cursor: pointer; }
+
 main {
   max-width: 640px;
   margin: 0 auto;
