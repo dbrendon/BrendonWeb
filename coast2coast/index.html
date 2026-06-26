@@ -38,14 +38,15 @@
   <main>
     <div id="request-panel" class="card hidden">
       <div id="selected-song-display" class="selected-song"></div>
-      <label for="requester-name">Your name *</label>
+      <label for="requester-name">Name (required)</label>
       <input type="text" id="requester-name" placeholder="Your name" maxlength="50" autocomplete="off" required>
-      <label for="tip-amount">Tip Amount * &nbsp;(tip jar or eTransfer)</label>
+      
+      <label for="tip-amount">Tip Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tip jar or eTransfer:&nbsp;</label><button type="button" id="copy-email-btn" onclick="copyEmail()" style="background:none;border:none;cursor:pointer;padding:0.75rem 0.75rem 0.75rem 0;color:var(--accent);font-size:0.82rem;white-space:nowrap">david@brendon.ca</button>
       
       <div class="input-currency">
         <span>$</span>
-        <input type="number" id="tip-amount" min="1" step="1" placeholder=" suggested amount = $5" >
-        <button type="button" id="copy-email-btn" onclick="copyEmail()" style="background:none;border:none;cursor:pointer;padding:0.75rem 0.75rem 0.75rem 0;color:var(--accent);font-size:0.82rem;white-space:nowrap">david@brendon.ca</button>
+        <input type="number" id="tip-amount" min="1" step="1"  >
+        
       </div>
       <div class="button-row">
         <button id="submit-btn" class="btn btn-primary">Send Request</button>
