@@ -173,6 +173,31 @@ label {
 
 label .optional { font-style: italic; }
 
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.field-row label {
+  display: inline;
+  margin: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.field-row input[type="text"] {
+  flex: 1;
+  margin: 0;
+}
+
+.field-note {
+  font-size: 0.82rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 /* Song list */
 #search-wrapper { margin-bottom: 0.75rem; }
 
