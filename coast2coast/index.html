@@ -122,7 +122,7 @@
     });
 
     function showSections(visible) {
-      ['song-list-section', 'queue-section', 'band-queue-footer'].forEach(id =>
+      ['song-list-section', 'queue-section'].forEach(id =>
         document.getElementById(id).classList.toggle('hidden', !visible)
       );
     }
@@ -130,7 +130,7 @@
     function selectSong(title, artist) {
       selectedSong = { title, artist };
       document.getElementById('selected-song-display').innerHTML =
-        `Requesting: "${esc(title)}" <span class="by">by ${esc(artist)}</span>`;
+        `"${esc(title)}" <span class="by">by ${esc(artist)}</span>`;
       const panel = document.getElementById('request-panel');
       panel.classList.remove('hidden');
       showSections(false);
@@ -259,7 +259,7 @@
     }
   </script>
 
-  <footer id="band-queue-footer" style="text-align:center;padding:1.5rem 1rem 2rem">
+  <footer style="text-align:center;padding:1.5rem 1rem 2rem">
     <a href="queue.html" class="btn btn-ghost btn-sm" style="opacity:0.4;font-size:0.72rem">Band Queue</a>
   </footer>
 </body>
