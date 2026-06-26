@@ -119,6 +119,7 @@ h2 {
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.2s;
+  width: fit-content;
 }
 .input-currency:focus-within { border-color: var(--accent); }
 .input-currency > span {
@@ -128,8 +129,8 @@ h2 {
   user-select: none;
 }
 .input-currency input[type="number"] {
-  flex: 1;
-  padding: 0.75rem 1rem 0.75rem 0.25rem;
+  width: 6ch;
+  padding: 0.75rem 0.5rem 0.75rem 0.25rem;
   background: transparent;
   border: none;
   border-radius: 0;
