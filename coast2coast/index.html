@@ -37,6 +37,7 @@
 
   <main>
     <div id="request-panel" class="card hidden">
+      <div>Requesting</div>
       <div id="selected-song-display" class="selected-song"></div>
       <div class="field-row">
         <label for="requester-name">Name</label>
@@ -49,7 +50,9 @@
           <span>$</span>
           <input type="number" id="tip-amount" min="1" step="1">
         </div>
-        <span class="field-note">tip jar or eTransfer: <button type="button" id="copy-email-btn" onclick="copyEmail()" style="background:none;border:none;cursor:pointer;padding:0;color:var(--accent);font-size:0.82rem;white-space:nowrap;vertical-align:baseline">david@brendon.ca</button></span>
+      </div>
+      <div class="field-row">
+        <span class="field-note">Use tip jar or eTransfer to : <button type="button" id="copy-email-btn" onclick="copyEmail()" style="background:none;border:none;cursor:pointer;padding:0;color:var(--accent);font-size:0.82rem;white-space:nowrap;vertical-align:baseline">david@brendon.ca</button></span>        
       </div>
       <div class="button-row">
         <button id="submit-btn" class="btn btn-primary">Send Request</button>
