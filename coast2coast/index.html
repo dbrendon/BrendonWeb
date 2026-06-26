@@ -58,14 +58,14 @@
       <div id="submit-status" class="status-msg"></div>
     </div>
 
-    <section class="card">
+    <section id="song-list-section" class="card">
       <div id="search-wrapper">
         <input type="search" id="song-search" placeholder="Search our list..." autocomplete="off" aria-label="Search songs">
       </div>
       <div id="song-list"><p class="muted">Loading songs...</p></div>
     </section>
 
-    <section class="card">
+    <section id="queue-section" class="card">
       <h1>Requests Queue</h1>
       <div id="queue-list"><p class="muted">Loading...</p></div>
     </section>
@@ -119,12 +119,19 @@
       ));
     });
 
+    function showSections(visible) {
+      ['song-list-section', 'queue-section'].forEach(id =>
+        document.getElementById(id).classList.toggle('hidden', !visible)
+      );
+    }
+
     function selectSong(title, artist) {
       selectedSong = { title, artist };
       document.getElementById('selected-song-display').innerHTML =
-        `"${esc(title)}" <span class="by">by ${esc(artist)}</span>`;
+        `Requesting: "${esc(title)}" <span class="by">by ${esc(artist)}</span>`;
       const panel = document.getElementById('request-panel');
       panel.classList.remove('hidden');
+      showSections(false);
       document.getElementById('requester-name').value = '';
       document.getElementById('tip-amount').value = '';
       document.getElementById('submit-status').textContent = '';
@@ -137,6 +144,7 @@
 
     document.getElementById('cancel-btn').addEventListener('click', () => {
       document.getElementById('request-panel').classList.add('hidden');
+      showSections(true);
       selectedSong = null;
     });
 
@@ -189,6 +197,7 @@
           refreshQueue();
           setTimeout(() => {
             document.getElementById('request-panel').classList.add('hidden');
+            showSections(true);
             selectedSong = null;
             btn.disabled = false;
             btn.textContent = 'Send Request';
