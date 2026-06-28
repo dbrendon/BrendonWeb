@@ -74,6 +74,8 @@
   </main>
 
   <script>
+    const REQUIRE_TIP = false; // set to true to make tip amount mandatory
+
     let allSongs = [];
     let selectedSong = null;
 
@@ -166,7 +168,7 @@
       const statusEl  = document.getElementById('submit-status');
 
       const name = nameInput.value.trim();
-      const tip  = parseInt(tipInput.value, 10);
+      const tip  = tipInput.value ? parseInt(tipInput.value, 10) : 0;
 
       if (!name) {
         statusEl.textContent = 'Please enter your name.';
@@ -174,21 +176,19 @@
         nameInput.focus();
         return;
       }
-      // if (!tipInput.value || isNaN(tip) || tip < 1) {
-      //   statusEl.textContent = 'Please enter a tip amount (minimum $1).';
-      //   statusEl.className = 'status-msg error';
-      //   tipInput.focus();
-      //   return;
-      // }
-      if (tipInput.value) {
-        if (isNaN(tip) || tip < 1) {
-          statusEl.textContent = 'Please enter a valid tip amount (minimum $1).';
-          statusEl.className = 'status-msg error';
-          tipInput.focus();
-          return;
-        }    
+      if (REQUIRE_TIP && (!tipInput.value || isNaN(tip) || tip < 1)) {
+        statusEl.textContent = 'Please enter a tip amount (minimum $1).';
+        statusEl.className = 'status-msg error';
+        tipInput.focus();
+        return;
       }
-  
+      if (tipInput.value && (isNaN(tip) || tip < 1)) {
+        statusEl.textContent = 'Please enter a valid tip amount (minimum $1).';
+        statusEl.className = 'status-msg error';
+        tipInput.focus();
+        return;
+      }
+
 
       btn.disabled = true;
       btn.textContent = 'Sending...';
