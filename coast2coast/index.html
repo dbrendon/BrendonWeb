@@ -174,12 +174,21 @@
         nameInput.focus();
         return;
       }
-      if (!tipInput.value || isNaN(tip) || tip < 1) {
-        statusEl.textContent = 'Please enter a tip amount (minimum $1).';
-        statusEl.className = 'status-msg error';
-        tipInput.focus();
-        return;
+      // if (!tipInput.value || isNaN(tip) || tip < 1) {
+      //   statusEl.textContent = 'Please enter a tip amount (minimum $1).';
+      //   statusEl.className = 'status-msg error';
+      //   tipInput.focus();
+      //   return;
+      // }
+      if (tipInput.value) {
+        if (isNaN(tip) || tip < 1) {
+          statusEl.textContent = 'Please enter a valid tip amount (minimum $1).';
+          statusEl.className = 'status-msg error';
+          tipInput.focus();
+          return;
+        }    
       }
+  
 
       btn.disabled = true;
       btn.textContent = 'Sending...';
